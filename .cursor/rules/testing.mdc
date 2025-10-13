@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+globs:
+---
+
+# Testing
+
+## Test Format
+
+* Never use **table-driven tests**
+* Always write **one testing function per tested function**
+* Named with the pattern `Test{NameOfFunction}`
+* Each test function must:
+  * Start with a `t.Parallel()` call at the root of the test.
+  * Define all test cases as **subtests** using `t.Run()`.
+  * Each subtest must also call `t.Parallel()` inside it.
