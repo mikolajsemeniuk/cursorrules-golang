@@ -5,12 +5,281 @@ globs:
 
 # Testing
 
-## Test Format
-
 * Never use **table-driven tests**
 * Always write **one testing function per tested function**
 * Named with the pattern `Test{NameOfFunction}`
-* Each test function must:
-  * Start with a `t.Parallel()` call at the root of the test.
-  * Define all test cases as **subtests** using `t.Run()`.
-  * Each subtest must also call `t.Parallel()` inside it.
+* Start with a `t.Parallel()` call at the root of the test
+* Define all test cases as **subtests** using `t.Run()`
+* Each subtest must also call `t.Parallel()` inside it
+* After `t.Parallel()`, `arrange`, `act` or `assert` make empty line
+* Each test file must be named {filename}_test.go
+* Each subtest name must follow PascalCase
+* Use `got`, `want` instead of `expected` and `actual`
+* Do not write comments
+
+## Example of code to test
+
+```go
+// pkg/example/service.go
+package example
+
+import (
+    "errors"
+    "fmt"
+    "net/http"
+)
+
+type Storage interface {
+    Find() (string, error)
+    Add(string) error
+}
+
+type Server struct {
+    storage Storage
+}
+
+func NewServer(s Storage) *Server {
+    return &Server{storage: s}
+}
+
+func (s *Server) Find(w http.ResponseWriter, r *http.Request) {
+    response, err := s.storage.Find()
+    if err != nil {
+        w.WriteHeader(http.StatusNotFound)
+        fmt.Fprint(w, `{ "message": "not found" }`)
+        return
+    }
+
+    fmt.Fprint(w, response)
+}
+
+func (s *Server) Add(w http.ResponseWriter, r *http.Request) {
+    query := r.URL.Query()
+    name := query.Get("name")
+
+    if err := s.storage.Add(name); err != nil {
+        w.WriteHeader(http.StatusNotFound)
+        fmt.Fprint(w, `{ "message": "not found" }`)
+        return
+    }
+
+    fmt.Fprint(w, `{ "message": "success" }`)
+}
+
+func Format(v string) (string, error) {
+    if v == "" {
+        return "", errors.New("value cannot be empty string")
+    }
+
+    return fmt.Sprintf("formatted: %s", v), nil
+}
+```
+
+## Example of good tested code
+
+```go
+// pkg/example/service_test.go
+package example_test
+
+import (
+ "cursor-rules-golang/pkg/example"
+ "errors"
+ "fmt"
+ "net/http"
+ "net/http/httptest"
+ "testing"
+
+ "github.com/stretchr/testify/assert"
+)
+
+type mock struct {
+    find func() (string, error)
+    add  func(string) error
+}
+
+func (m *mock) Find() (string, error) { return m.find() }
+func (m *mock) Add(v string) error    { return m.add(v) }
+
+func TestServer(t *testing.T) {
+    t.Parallel()
+
+    t.Run("FindOk", func(t *testing.T) {
+        t.Parallel()
+
+        wantBody := `{ "message": "ok" }`
+        wantStatus := http.StatusOK
+        m := &mock{find: func() (string, error) { return wantBody, nil }}
+        recorder := httptest.NewRecorder()
+        server := example.NewServer(m)
+
+        server.Find(recorder, &http.Request{})
+
+        assert.Equal(t, wantStatus, recorder.Code)
+        assert.Equal(t, wantBody, recorder.Body.String())
+    })
+
+    t.Run("FindNotFound", func(t *testing.T) {
+        t.Parallel()
+
+        wantBody := `{ "message": "not found" }`
+        wantStatus := http.StatusNotFound
+        m := &mock{find: func() (string, error) { return wantBody, errors.New("not found") }}
+        server := example.NewServer(m)
+        recorder := httptest.NewRecorder()
+
+        server.Find(recorder, &http.Request{})
+
+        assert.Equal(t, wantStatus, recorder.Code)
+        assert.Equal(t, wantBody, recorder.Body.String())
+    })
+
+    t.Run("AddOk", func(t *testing.T) {
+        t.Parallel()
+
+        wantBody := `{ "message": "success" }`
+        wantStatus := http.StatusOK
+        m := &mock{add: func(string) error { return nil }}
+        server := example.NewServer(m)
+        recorder := httptest.NewRecorder()
+
+        request, _ := http.NewRequest("GET", "/add?name=mike", nil)
+        server.Add(recorder, request)
+
+        assert.Equal(t, wantStatus, recorder.Code)
+        assert.Equal(t, wantBody, recorder.Body.String())
+    })
+}
+
+func TestFormat(t *testing.T) {
+    t.Parallel()
+
+    t.Run("FormatValue", func(t *testing.T) {
+        t.Parallel()
+
+        in := "value"
+        want := fmt.Sprintf("formatted: %s", in)
+        got, err := example.Format(in)
+
+        assert.NoError(t, err)
+        assert.Equal(t, want, got, "The two words should be the same")
+    })
+
+    t.Run("ReturnError", func(t *testing.T) {
+        t.Parallel()
+
+        var in string
+        var want string
+        got, err := example.Format(in)
+
+        assert.EqualError(t, err, "value cannot be empty string")
+        assert.Equal(t, want, got, "The two words should be the same")
+    })
+}
+```
+
+## Example of bad written code
+
+```go
+// ❌ Using table-driven tests (explicitly forbidden)
+func TestServer(t *testing.T) {
+    tests := []struct {
+        name           string
+        method         string
+        path           string
+        mockSetup      func(*mocks.Storage)
+        wantStatus     int
+        wantBody       string
+    }{
+        {
+            name:   "find ok",
+            method: "GET",
+            path:   "/find",
+            mockSetup: func(m *mocks.Storage) {
+                m.On("Find").Return(`{ "message": "ok" }`, nil)
+            },
+            wantStatus: http.StatusOK,
+            wantBody:   `{ "message": "ok" }`,
+        },
+        {
+            name:   "find not found",
+            method: "GET",
+            path:   "/find",
+            mockSetup: func(m *mocks.Storage) {
+                m.On("Find").Return("", errors.New("not found"))
+            },
+            wantStatus: http.StatusNotFound,
+            wantBody:   `{ "message": "not found" }`,
+        },
+        {
+            name:   "add ok",
+            method: "GET",
+            path:   "/add?name=mike",
+            mockSetup: func(m *mocks.Storage) {
+                m.On("Add", "mike").Return(nil)
+            },
+            wantStatus: http.StatusOK,
+            wantBody:   `{ "message": "success" }`,
+        },
+        {
+            name:   "add not found",
+            method: "GET",
+            path:   "/add?name=john",
+            mockSetup: func(m *mocks.Storage) {
+                m.On("Add", "john").Return(errors.New("not found"))
+            },
+            wantStatus: http.StatusNotFound,
+            wantBody:   `{ "message": "not found" }`,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            // ❌ Using generated mocks instead of simple inline mocks
+            mockStorage := mocks.NewStorage(t)
+            tt.mockSetup(mockStorage)
+            
+            server := example.NewServer(mockStorage)
+            recorder := httptest.NewRecorder()
+            request, _ := http.NewRequest(tt.method, tt.path, nil)
+
+            // ❌ Generic handler call - not testing specific methods
+            if tt.path == "/find" {
+                server.Find(recorder, request)
+            } else {
+                server.Add(recorder, request)
+            }
+
+            assert.Equal(t, tt.wantStatus, recorder.Code)
+            assert.Equal(t, tt.wantBody, recorder.Body.String())
+            
+            // ❌ Mockery-specific assertion
+            mockStorage.AssertExpectations(t)
+        })
+    }
+}
+
+func TestFormat(t *testing.T) {
+    // ❌ Using table-driven tests (explicitly forbidden)
+    tests := []struct {
+        name    string
+        input   string
+        want    string
+        wantErr bool
+    }{
+        {"valid input", "value", "formatted: value", false},
+        {"empty string", "", "", true},
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got, err := example.Format(tt.input)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("Format() error = %v, wantErr %v", err, tt.wantErr)
+            }
+            if got != tt.want {
+                t.Errorf("Format() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+```
