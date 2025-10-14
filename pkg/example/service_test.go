@@ -12,57 +12,81 @@ import (
 )
 
 type mock struct {
-	find func() (string, error)
-	add  func(string) error
+	find   func(string) (string, error)
+	update func(string, string) error
 }
 
-func (m *mock) Find() (string, error) { return m.find() }
-func (m *mock) Add(v string) error    { return m.add(v) }
+func (m *mock) Find(name string) (string, error)       { return m.find(name) }
+func (m *mock) Update(name string, value string) error { return m.update(name, value) }
 
-func TestServer(t *testing.T) {
+func TestServer_Find(t *testing.T) {
 	t.Parallel()
 
-	t.Run("FindOk", func(t *testing.T) {
+	t.Run("Ok", func(t *testing.T) {
 		t.Parallel()
 
 		wantBody := `{ "message": "ok" }`
 		wantStatus := http.StatusOK
-		m := &mock{find: func() (string, error) { return wantBody, nil }}
+		m := &mock{find: func(string) (string, error) { return wantBody, nil }}
 		recorder := httptest.NewRecorder()
 		server := example.NewServer(m)
 
-		server.Find(recorder, &http.Request{})
+		request, err := http.NewRequest("GET", "/find?name=mike", nil)
+		assert.NoError(t, err)
+		server.Find(recorder, request)
 
 		assert.Equal(t, wantStatus, recorder.Code)
 		assert.Equal(t, wantBody, recorder.Body.String())
 	})
 
-	t.Run("FindNotFound", func(t *testing.T) {
+	t.Run("NotFound", func(t *testing.T) {
 		t.Parallel()
 
 		wantBody := `{ "message": "not found" }`
 		wantStatus := http.StatusNotFound
-		m := &mock{find: func() (string, error) { return wantBody, errors.New("not found") }}
+		m := &mock{find: func(string) (string, error) { return wantBody, errors.New("not found") }}
 		server := example.NewServer(m)
 		recorder := httptest.NewRecorder()
 
-		server.Find(recorder, &http.Request{})
+		request, err := http.NewRequest("GET", "/find?name=mike", nil)
+		assert.NoError(t, err)
+		server.Find(recorder, request)
+
+		assert.Equal(t, wantStatus, recorder.Code)
+		assert.Equal(t, wantBody, recorder.Body.String())
+	})
+}
+
+func TestServer_Update(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Ok", func(t *testing.T) {
+		t.Parallel()
+
+		wantBody := `{ "message": "success" }`
+		wantStatus := http.StatusOK
+		m := &mock{update: func(string, string) error { return nil }}
+		server := example.NewServer(m)
+		recorder := httptest.NewRecorder()
+
+		request, _ := http.NewRequest("GET", "/update?name=mike&value=123", nil)
+		server.Update(recorder, request)
 
 		assert.Equal(t, wantStatus, recorder.Code)
 		assert.Equal(t, wantBody, recorder.Body.String())
 	})
 
-	t.Run("AddOk", func(t *testing.T) {
+	t.Run("NotFound", func(t *testing.T) {
 		t.Parallel()
 
-		wantBody := `{ "message": "success" }`
-		wantStatus := http.StatusOK
-		m := &mock{add: func(string) error { return nil }}
+		wantBody := `{ "message": "not found" }`
+		wantStatus := http.StatusNotFound
+		m := &mock{update: func(string, string) error { return errors.New("not found") }}
 		server := example.NewServer(m)
 		recorder := httptest.NewRecorder()
 
-		request, _ := http.NewRequest("GET", "/add?name=mike", nil)
-		server.Add(recorder, request)
+		request, _ := http.NewRequest("GET", "/update?name=mike&value=123", nil)
+		server.Update(recorder, request)
 
 		assert.Equal(t, wantStatus, recorder.Code)
 		assert.Equal(t, wantBody, recorder.Body.String())

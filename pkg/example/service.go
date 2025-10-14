@@ -7,8 +7,8 @@ import (
 )
 
 type Storage interface {
-	Find() (string, error)
-	Add(string) error
+	Find(name string) (string, error)
+	Update(name string, value string) error
 }
 
 type Server struct {
@@ -20,21 +20,25 @@ func NewServer(s Storage) *Server {
 }
 
 func (s *Server) Find(w http.ResponseWriter, r *http.Request) {
-	response, err := s.storage.Find()
+	query := r.URL.Query()
+	name := query.Get("name")
+
+	res, err := s.storage.Find(name)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, `{ "message": "not found" }`)
 		return
 	}
 
-	fmt.Fprint(w, response)
+	fmt.Fprint(w, res)
 }
 
-func (s *Server) Add(w http.ResponseWriter, r *http.Request) {
+func (s *Server) Update(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	name := query.Get("name")
+	value := query.Get("value")
 
-	if err := s.storage.Add(name); err != nil {
+	if err := s.storage.Update(name, value); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, `{ "message": "not found" }`)
 		return
