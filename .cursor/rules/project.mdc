@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+globs:
+---
+
+# Project
+
+* Always try to call files one descriptive word without abbreviation, `-` or `_`.
+  
+  **✅ Good examples:**
+  * `errors.go`
+  * `middleware.go`
+  * `auth.go`
+  * `handler.go`
+  * `server.go`
+  * `templates.go`
+  * `service.go`
+  * `telemetry.go`
+  * `metrics.go`
+  * `client.go`
+  * `storage.go`
+  
+  **❌ Bad examples:**
+  * `request-processor.go`
+  * `echo_middleware.go`
+
+* Always try to call folders one descriptive word, ideally without abbreviation however if for some reasons it cannot be done use golang lowercase concatenation without `-`, `_` instead, Example of good names: `templates.go`, `cmd`, `storage`, `server` `pkg` `httptest`, `ioutil`, `strings`, `syncmap`, `textproto`, `htmltemplate`

@@ -1,0 +1,91 @@
+---
+alwaysApply: true
+globs:
+---
+
+# Coding
+
+* Do not write comments.
+* Always write one short, ideally word or abbreviated variable names, unless live scope of given variable is long so in this case do not abbreviation but one word name.
+
+  **✅ Good examples:**
+  * `in` (input)
+  * `out` (output)
+  * `input` (input)
+  * `output` (output)
+  * `payload` (payload)
+  * `req` (request)
+  * `request` (request)
+  * `res` (response/result)
+  * `result` (result)
+  * `response` (response)
+  * `src` (source)
+  * `source` (source)
+  * `bin` (binary)
+  * `ctx` (context)
+  * `opt` (option)
+  * `err` (error)
+  * `msg` (message)
+  * `str` (string)
+  * `num` (number)
+  * `tmp` (temporary)
+  * `buf` (buffer)
+  * `data` (data)
+  * `url` (url)
+  * `svc` (service)
+  * `cli` (client)
+  * `conn` (connection)
+  * `key` (key)
+  * `row` (row)
+  * `rows` (rows)
+  * `col` (column)
+  * `query` (query)
+  * `file` (file)
+  * `filepath` (file path)
+  * `path` (path)
+  * `dir` (directory)
+  * `ext` (extension)
+  * `now` (now/current time)
+  * `start` (start time)
+  * `end` (end time)
+  * `node` (node)
+  * `store` (store/storage)
+  * `i`, `j`, `k` (loop indices)
+  * `v` (loop value)
+  * `val` (value)
+  * `value` (value)
+  * `item` (item)
+  * `host` (host)
+  * `port` (port)
+  * `addr` (address)
+  * `n` (number/count)
+  * `id` (identifier)
+  * `count` (count)
+  * `total` (total)
+  
+  **❌ Bad examples:**
+  * `requestProcessor.go`
+  * `echo_middleware.go`
+  * `user_name` (use name or user)
+  * `request_payload` (use req or payload)
+  * `response_data` (use res or data)
+  * `temp_variable` (use tmp)
+  * `error_message` (use err or msg)
+  * `databaseConnection` (use conn or db)
+  * `inputString` (use in or str)
+  * `outputBuffer` (use out or buf)
+  * `filePathName` (use path or filepath)
+  * `userId` (use id)
+  * `apiResponse` (use res or response)
+  * `strValue` (use str or val)
+  * `arrItems` (use items)
+  * `numCount` (use count or num)
+  * `boolFlag` (use flag)
+  * `mapData` (use data or m)
+  * `ctxContext` (redundant, use ctx)
+  * `requestBody` (use req or body)
+  * `jsonPayload` (use payload or data)
+
+* Write variable names 2 word long when in given scope are 2 things the same kind
+
+* httpClient (use cli or client)
