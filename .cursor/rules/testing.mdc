@@ -36,18 +36,18 @@ type Storage interface {
 }
 
 type Server struct {
-    storage Storage
+    store Storage
 }
 
 func NewServer(s Storage) *Server {
-    return &Server{storage: s}
+    return &Server{store: s}
 }
 
 func (s *Server) Find(w http.ResponseWriter, r *http.Request) {
     query := r.URL.Query()
     name := query.Get("name")
 
-    res, err := s.storage.Find(name)
+    res, err := s.store.Find(name)
     if err != nil {
         w.WriteHeader(http.StatusNotFound)
         fmt.Fprint(w, `{ "message": "not found" }`)
@@ -62,7 +62,7 @@ func (s *Server) Update(w http.ResponseWriter, r *http.Request) {
     name := query.Get("name")
     value := query.Get("value")
 
-    if err := s.storage.Update(name, value); err != nil {
+    if err := s.store.Update(name, value); err != nil {
         w.WriteHeader(http.StatusNotFound)
         fmt.Fprint(w, `{ "message": "not found" }`)
         return
