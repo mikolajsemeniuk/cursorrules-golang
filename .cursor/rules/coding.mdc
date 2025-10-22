@@ -7,7 +7,6 @@ globs:
 
 * Do not write comments.
 * Always write one short, ideally word or abbreviated variable names, unless live scope of given variable is long so in this case do not abbreviation but one word name.
-
   **✅ Good examples:**
   * `in` (input)
   * `out` (output)
@@ -84,8 +83,20 @@ globs:
   * `mapData` (use data or m)
   * `ctxContext` (redundant, use ctx)
   * `requestBody` (use req or body)
-  * `jsonPayload` (use payload or data)
-
-* Write variable names 2 word long when in given scope are 2 things the same kind
-
-* httpClient (use cli or client)
+  * `jsonPayload` (use payload or data)  
+* Write variable names 2 word long when in given scope are 2 things the same kind and is necessary
+* Keep using `NewA()`, `NewB()`, `NewC()` naming convention instead of `TransformA`, `NewB`, `CreateC` when creating new things
+* Do not use `else`, better use `return`, `continue` or `break`
+* Prefer writing functions which accept arguments and return new result instead of functions which modify themselves
+* Use values instead of pointers, unless you really have to
+* Handle errors immediately, do not ignore them
+* Use `errors.New()` for simple error messages
+* Use `fmt.Errorf()` for formatted error messages
+* Return errors, do not log them in business logic
+* Keep interfaces small and focused
+* Accept interfaces, return concrete types
+* Use interfaces for behavior, not data
+* Prefer `make()` with capacity when you know the size
+* Use `strings.Builder` for string concatenation in loops
+* Avoid unnecessary allocations
+* Prefer consistent function naming verbs: Use: List, Find, Create, Update, Remove, Avoid: Fetch, Get, Add, Edit, Delete ✅ Examples: ListUsers(), FindUserByID(), CreateUser(), UpdateProfile(), RemoveSession(). ❌ Bad: FetchUsers(), GetUserByID(), AddUser(), EditProfile(), DeleteSession()

@@ -6,7 +6,6 @@ globs:
 # Project
 
 * Always try to call files one descriptive word without abbreviation, `-` or `_`.
-  
   **✅ Good examples:**
   * `errors.go`
   * `middleware.go`
@@ -23,5 +22,82 @@ globs:
   **❌ Bad examples:**
   * `request-processor.go`
   * `echo_middleware.go`
-
 * Always try to call folders one descriptive word, ideally without abbreviation however if for some reasons it cannot be done use golang lowercase concatenation without `-`, `_` instead, Example of good names: `templates.go`, `cmd`, `storage`, `server` `pkg` `httptest`, `ioutil`, `strings`, `syncmap`, `textproto`, `htmltemplate`
+* Prefer feature-oriented packages over entity-oriented packages
+  **✅ Good examples:**
+
+  ```sh
+  auth/
+    handler.go
+    service.go
+    storage.go
+  
+  user/
+    handler.go
+    service.go
+    storage.go
+  
+  order/
+    handler.go
+    service.go
+    storage.go
+  ```
+
+  **❌ Bad examples:**
+
+  ```sh
+  handlers/
+    auth.go
+    user.go
+    order.go
+  
+  services/
+    auth.go
+    user.go
+    order.go
+  
+  storages/
+    auth.go
+    user.go
+    order.go
+  ```
+  
+* Use consistent file names across different packages when possible
+
+  **✅ Good examples:**
+
+  ```sh
+  auth/
+    handler.go
+    service.go
+    storage.go
+  
+  user/
+    handler.go
+    service.go
+    storage.go
+  
+  order/
+    handler.go
+    service.go
+    storage.go
+  ```
+
+  **❌ Bad examples:**
+
+  ```sh
+  auth/
+    handler.go
+    service.go
+    storage.go
+  
+  user/
+    http.go
+    svc.go
+    store.go
+  
+  order/
+    server.go
+    service.go
+    db.go
+  ```
