@@ -89,14 +89,9 @@ globs:
 * Do not use `else`, better use `return`, `continue` or `break`
 * Prefer writing functions which accept arguments and return new result instead of functions which modify themselves
 * Use values instead of pointers, unless you really have to
-* Handle errors immediately, do not ignore them
-* Use `errors.New()` for simple error messages
-* Use `fmt.Errorf()` for formatted error messages
 * Return errors, do not log them in business logic
-* Keep interfaces small and focused
-* Accept interfaces, return concrete types
-* Use interfaces for behavior, not data
 * Prefer `make()` with capacity when you know the size
 * Use `strings.Builder` for string concatenation in loops
-* Avoid unnecessary allocations
 * Prefer consistent function naming verbs: Use: List, Find, Create, Update, Remove, Avoid: Fetch, Get, Add, Edit, Delete ✅ Examples: ListUsers(), FindUserByID(), CreateUser(), UpdateProfile(), RemoveSession(). ❌ Bad: FetchUsers(), GetUserByID(), AddUser(), EditProfile(), DeleteSession()
+* Do not nest - ideal indentation is one level, max 2 if necessary, better use return multiple times to remove indentation except for 3 level indentation and only 1 return
+* Avoid unnecessary context like user.Username or Product.ProductID, just use product.ID or user.name
