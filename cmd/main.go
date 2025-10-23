@@ -18,17 +18,14 @@ func main() {
 	fmt.Println()
 
 	// --- Example 2: errors.Join (joining multiple errors)
-	err2 := errors.Join(
-		ErrProductNotFound,
-		fmt.Errorf("productID: %s", productID),
-	)
+	err2 := errors.Join(ErrProductNotFound, fmt.Errorf("productID: %s", productID))
 
 	fmt.Println("=== EXAMPLE 2: errors.Join(...) ===")
 	fmt.Println("Error message:", err2)
 	fmt.Println("errors.Is(err2, ErrProductNotFound):", errors.Is(err2, ErrProductNotFound))
 	fmt.Println()
 
-	// --- Regular arror
+	// --- Regular error
 	err3 := fmt.Errorf("product not found (productID=%s)", productID)
 	fmt.Println("=== EXAMPLE 3: zwykły error bez wrapa ===")
 	fmt.Println("Error message:", err3)
