@@ -10,3 +10,5 @@ globs:
 * Prefer first checking errors with `errors.Is` and then later in the same indentation check if `err != nil` instead of checking `err != nil` and then in this if block check if `errors.Is(err, target)`
 * Always put `ErrProductNotFound` first and then context like `productID: %s` after to first see general static error and context later
 * Make meaningful, descriptive errors understandable for end users about what's going on
+* Use `errors.Join()` to combine multiple errors instead of concatenating error messages
+* Avoid panic() in business logic - return errors instead and let the caller decide how to handle them
