@@ -95,3 +95,4 @@ globs:
 * Prefer consistent function naming verbs: Use: List, Find, Create, Update, Remove, Avoid: Fetch, Get, Add, Edit, Delete ✅ Examples: ListUsers(), FindUserByID(), CreateUser(), UpdateProfile(), RemoveSession(). ❌ Bad: FetchUsers(), GetUserByID(), AddUser(), EditProfile(), DeleteSession()
 * Do not nest - ideal indentation is one level, max 2 if necessary, better use return multiple times to remove indentation except for 3 level indentation and only 1 return
 * Avoid unnecessary context like user.Username or Product.ProductID, just use product.ID or user.Name when declaring variables or properties
+* For more than 3 parameters create `${FunctionName}Input` struct to pass arguments
